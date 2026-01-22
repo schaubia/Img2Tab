@@ -88,82 +88,80 @@ if uploaded_file is not None:
         # Extract text using Tesseract OCR on processed image
         custom_config = r'--oem 3 --psm 6'
         extracted_text = pytesseract.image_to_string(processed_image, config=custom_config)
+        
+        # Parse the extracted text into a table
+        lines = extracted_text.strip().split('\n')
+        lines = [line.strip() for line in lines if line.strip()]
+        
+        # Try to split each line into columns
+        table_data = []
+        for line in lines:
+            # Split by multiple spaces or tabs
+            row = re.split(r'\s{2,}|\t+', line)
+            row = [cell.strip() for cell in row if cell.strip()]
+            if row:
+                table_data.append(row)
+        
+        if table_data:
+            # Determine max columns
+            max_cols = max(len(row) for row in table_data)
             
-            # Parse the extracted text into a table
-            lines = extracted_text.strip().split('\n')
-            lines = [line.strip() for line in lines if line.strip()]
+            # Pad rows to have equal columns
+            for row in table_data:
+                while len(row) < max_cols:
+                    row.append('')
             
-            # Try to split each line into columns
-            table_data = []
-            for line in lines:
-                # Split by multiple spaces or tabs
-                row = re.split(r'\s{2,}|\t+', line)
-                row = [cell.strip() for cell in row if cell.strip()]
-                if row:
-                    table_data.append(row)
-            
-            if table_data:
-                # Determine max columns
-                max_cols = max(len(row) for row in table_data)
-                
-                # Pad rows to have equal columns
-                for row in table_data:
-                    while len(row) < max_cols:
-                        row.append('')
-                
-                # Create DataFrame based on header selection
-                if has_header and len(table_data) > 1:
-                    df = pd.DataFrame(table_data[1:], columns=table_data[0])
-                else:
-                    # No header - use default column names
-                    df = pd.DataFrame(table_data)
-                    df.columns = [f'Column_{i+1}' for i in range(len(df.columns))]
-                
-                # Try to convert numeric columns
-                for col in df.columns:
-                    try:
-                        # Remove common numeric separators and convert
-                        df[col] = df[col].str.replace(',', '').str.replace('$', '').str.strip()
-                        df[col] = pd.to_numeric(df[col], errors='ignore')
-                    except:
-                        pass
-                
-                st.dataframe(df, use_container_width=True)
-                
-                st.subheader("Download Options")
-                
-                col_a, col_b = st.columns(2)
-                
-                col_a, col_b = st.columns(2)
-                
-                # CSV download
-                with col_a:
-                    csv = df.to_csv(index=False)
-                    st.download_button(
-                        label="📥 Download as CSV",
-                        data=csv,
-                        file_name="table_data.csv",
-                        mime="text/csv",
-                        use_container_width=True
-                    )
-                
-                # Excel download
-                with col_b:
-                    buffer = io.BytesIO()
-                    with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
-                        df.to_excel(writer, index=False, sheet_name='Data')
-                    
-                    st.download_button(
-                        label="📥 Download as XLSX",
-                        data=buffer.getvalue(),
-                        file_name="table_data.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                        use_container_width=True
-                    )
-                
-                st.success("✅ Table extracted successfully!")
+            # Create DataFrame based on header selection
+            if has_header and len(table_data) > 1:
+                df = pd.DataFrame(table_data[1:], columns=table_data[0])
             else:
-                st.error("❌ Could not extract table data. Please ensure the image contains a clear table.")
+                # No header - use default column names
+                df = pd.DataFrame(table_data)
+                df.columns = [f'Column_{i+1}' for i in range(len(df.columns))]
+            
+            # Try to convert numeric columns
+            for col in df.columns:
+                try:
+                    # Remove common numeric separators and convert
+                    df[col] = df[col].str.replace(',', '').str.replace('$', '').str.strip()
+                    df[col] = pd.to_numeric(df[col], errors='ignore')
+                except:
+                    pass
+            
+            st.dataframe(df, use_container_width=True)
+            
+            st.subheader("Download Options")
+            
+            col_a, col_b = st.columns(2)
+            
+            # CSV download
+            with col_a:
+                csv = df.to_csv(index=False)
+                st.download_button(
+                    label="📥 Download as CSV",
+                    data=csv,
+                    file_name="table_data.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            
+            # Excel download
+            with col_b:
+                buffer = io.BytesIO()
+                with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                    df.to_excel(writer, index=False, sheet_name='Data')
+                
+                st.download_button(
+                    label="📥 Download as XLSX",
+                    data=buffer.getvalue(),
+                    file_name="table_data.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    use_container_width=True
+                )
+            
+            st.success("✅ Table extracted successfully!")
+        else:
+            st.error("❌ Could not extract table data. Please ensure the image contains a clear table.")
     
     with st.expander("📝 Raw Extracted Text"):
         st.text(extracted_text)
