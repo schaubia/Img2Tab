@@ -19,6 +19,9 @@ if uploaded_file is not None:
         st.subheader("Original Image")
         image = Image.open(uploaded_file)
         st.image(image, use_container_width=True)
+        
+        # Ask if table has header row
+        has_header = st.checkbox("Table has a header row", value=True, help="Check this if the first row contains column names")
     
     with col2:
         st.subheader("Extracted Table")
@@ -50,8 +53,13 @@ if uploaded_file is not None:
                     while len(row) < max_cols:
                         row.append('')
                 
-                # Create DataFrame
-                df = pd.DataFrame(table_data[1:], columns=table_data[0]) if len(table_data) > 1 else pd.DataFrame(table_data)
+                # Create DataFrame based on header selection
+                if has_header and len(table_data) > 1:
+                    df = pd.DataFrame(table_data[1:], columns=table_data[0])
+                else:
+                    # No header - use default column names
+                    df = pd.DataFrame(table_data)
+                    df.columns = [f'Column_{i+1}' for i in range(len(df.columns))]
                 
                 # Try to convert numeric columns
                 for col in df.columns:
