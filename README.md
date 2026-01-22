@@ -5,16 +5,18 @@ A free Streamlit application that converts screenshots of tables into downloadab
 ## Features
 
 - 📸 Upload JPG or PNG images containing tables
-- 🔧 **Advanced image preprocessing** for better OCR accuracy:
-  - Contrast enhancement
-  - Edge sharpening
-  - Noise reduction
-  - Binarization (black & white conversion)
+- 🎚️ **Advanced image preprocessing with granular slider controls**:
+  - Adjustable contrast enhancement (0.0 - 3.0x)
+  - Adjustable sharpness (0.0 - 3.0x)
+  - Adjustable brightness (0.5 - 2.0x)
+  - Noise reduction toggle
+  - Binarization with adjustable threshold (0-255)
+  - Quick presets for common scenarios
 - 🔍 Automatic text extraction using Tesseract OCR
 - 📊 Convert extracted data to structured DataFrame
 - 🎛️ Toggle header row recognition
 - 🔢 **Column count hint** - specify expected number of columns for improved parsing
-- 👀 Side-by-side preview of original and processed images
+- 👀 Side-by-side preview of original and processed images with real-time updates
 - 💾 Download as CSV or XLSX format
 - 🎯 Automatic numeric data type detection
 
@@ -78,12 +80,15 @@ Your app will be live at a free Streamlit Cloud URL!
 ## Usage
 
 1. Click "Browse files" to upload a screenshot (JPG or PNG)
-2. **Adjust preprocessing settings** in the sidebar:
-   - Enable "Enhance Contrast" for better visibility
-   - Enable "Sharpen Edges" to make borders clearer
-   - Enable "Reduce Noise" to clean up the image
-   - Enable "Binarize" for tables with very clear borders (black & white)
-3. View the original and processed images side-by-side
+2. **Adjust preprocessing sliders** in the sidebar for optimal results:
+   - **Contrast Enhancement**: Drag slider to adjust contrast (default: 2.0x)
+   - **Sharpness**: Control edge sharpness (default: 1.5x)
+   - **Brightness**: Adjust overall brightness (default: 1.0x)
+   - **Reduce Noise**: Toggle to remove artifacts
+   - **Binarize**: Enable for black & white conversion
+   - **Binarization Threshold**: Fine-tune the black/white cutoff (only when binarize enabled)
+   - **Quick Presets**: Click "Clear Table" or "Low Quality" for instant optimal settings
+3. View the original and processed images side-by-side with real-time updates
 4. Check or uncheck "Table has a header row" as needed
 5. **Optional but recommended:** Enable "Specify number of columns" and enter the exact column count
    - This significantly improves parsing accuracy for tables with known column counts
@@ -94,18 +99,22 @@ Your app will be live at a free Streamlit Cloud URL!
 
 ## Tips for Best Results
 
-- **Start with default preprocessing settings** - they work well for most tables
+- **Start with default slider settings** - they work well for most tables
+- **Use Quick Presets**:
+  - "Clear Table" - for high-quality scans with clear borders
+  - "Low Quality" - for blurry, low-contrast, or poorly lit images
+- **Fine-tune individual sliders**:
+  - **Contrast too low?** → Text appears faint → Increase contrast slider
+  - **Contrast too high?** → Text bleeds together → Decrease contrast slider
+  - **Blurry borders?** → Increase sharpness slider
+  - **Image too dark/light?** → Adjust brightness slider
+  - **For binarization**: Lower threshold = more black, Higher threshold = more white
 - **Use the column count feature** - if you know your table has exactly N columns, enable this option for much better accuracy
-- **For low-contrast images**: Enable all preprocessing options
-- **For very clear tables**: Try enabling "Binarize" for best results
-- **If text is blurry**: Make sure "Sharpen Edges" is enabled
-- **If background is noisy**: Enable "Reduce Noise"
+- **Watch the processed image preview** - adjust sliders until table borders and text are clearly visible
 - **If columns are misaligned**: Use the "Specify number of columns" option
 - Use high-resolution images with clear, readable text
-- Ensure good contrast between table text and background
 - Tables with clear column alignment work best
 - Avoid skewed or rotated images
-- Make sure the table has distinct row/column structure
 
 ## How It Works
 

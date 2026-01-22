@@ -8,36 +8,52 @@ import numpy as np
 
 st.set_page_config(page_title="Table Screenshot to Excel/CSV", page_icon="📊", layout="wide")
 
-def preprocess_image(image, enhance_contrast=True, sharpen=True, denoise=True, binarize=False):
+def preprocess_image(image, contrast=1.0, sharpness=1.0, brightness=1.0, denoise=False, binarize=False, threshold=128):
     """
-    Preprocess image to improve OCR accuracy
+    Preprocess image to improve OCR accuracy with adjustable levels
+    
+    Args:
+        image: PIL Image object
+        contrast: Contrast level (1.0 = original, >1.0 = more contrast)
+        sharpness: Sharpness level (1.0 = original, >1.0 = sharper)
+        brightness: Brightness level (1.0 = original, >1.0 = brighter)
+        denoise: Boolean to apply noise reduction
+        binarize: Boolean to convert to black & white
+        threshold: Threshold for binarization (0-255)
     """
     processed = image.copy()
     
-    # Convert to grayscale if needed
+    # Convert to RGB if needed
     if processed.mode != 'L' and processed.mode != 'RGB':
         processed = processed.convert('RGB')
     
-    # Denoise
+    # Denoise first (if enabled)
     if denoise:
         processed = processed.filter(ImageFilter.MedianFilter(size=3))
     
-    # Enhance contrast
-    if enhance_contrast:
-        enhancer = ImageEnhance.Contrast(processed)
-        processed = enhancer.enhance(2.0)  # Increase contrast
+    # Adjust brightness
+    if brightness != 1.0:
+        enhancer = ImageEnhance.Brightness(processed)
+        processed = enhancer.enhance(brightness)
     
-    # Sharpen edges (helps with borders)
-    if sharpen:
-        processed = processed.filter(ImageFilter.SHARPEN)
+    # Enhance contrast
+    if contrast != 1.0:
+        enhancer = ImageEnhance.Contrast(processed)
+        processed = enhancer.enhance(contrast)
+    
+    # Enhance sharpness
+    if sharpness != 1.0:
+        enhancer = ImageEnhance.Sharpness(processed)
+        processed = enhancer.enhance(sharpness)
+    
+    # Apply additional edge enhancement for high sharpness
+    if sharpness > 2.0:
         processed = processed.filter(ImageFilter.EDGE_ENHANCE)
     
     # Binarize (convert to pure black and white)
     if binarize:
         processed = processed.convert('L')
         processed = ImageOps.autocontrast(processed)
-        # Apply threshold
-        threshold = 128
         processed = processed.point(lambda p: 255 if p > threshold else 0)
     
     return processed
@@ -103,16 +119,82 @@ uploaded_file = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg
 if uploaded_file is not None:
     # Preprocessing options in sidebar
     st.sidebar.subheader("🔧 Image Preprocessing")
-    st.sidebar.markdown("Enhance image quality for better OCR results")
+    st.sidebar.markdown("Adjust enhancement levels for better OCR results")
     
-    enhance_contrast = st.sidebar.checkbox("Enhance Contrast", value=True, 
-                                          help="Increases contrast to make text and borders more visible")
-    sharpen = st.sidebar.checkbox("Sharpen Edges", value=True,
-                                  help="Sharpens borders and text edges")
+    # Contrast enhancement slider
+    contrast_level = st.sidebar.slider(
+        "Contrast Enhancement",
+        min_value=0.0,
+        max_value=3.0,
+        value=2.0,
+        step=0.1,
+        help="1.0 = original, >1.0 = more contrast, <1.0 = less contrast"
+    )
+    
+    # Sharpness enhancement slider
+    sharpness_level = st.sidebar.slider(
+        "Sharpness",
+        min_value=0.0,
+        max_value=3.0,
+        value=1.5,
+        step=0.1,
+        help="1.0 = original, >1.0 = sharper edges, <1.0 = softer"
+    )
+    
+    # Brightness adjustment slider
+    brightness_level = st.sidebar.slider(
+        "Brightness",
+        min_value=0.5,
+        max_value=2.0,
+        value=1.0,
+        step=0.1,
+        help="1.0 = original, >1.0 = brighter, <1.0 = darker"
+    )
+    
+    # Denoise checkbox (keep this as binary)
     denoise = st.sidebar.checkbox("Reduce Noise", value=True,
                                   help="Removes noise and artifacts from the image")
+    
+    # Binarize checkbox with threshold slider
     binarize = st.sidebar.checkbox("Binarize (Black & White)", value=False,
                                    help="Convert to pure black and white - best for clear tables")
+    
+    threshold = 128
+    if binarize:
+        threshold = st.sidebar.slider(
+            "Binarization Threshold",
+            min_value=0,
+            max_value=255,
+            value=128,
+            step=5,
+            help="Lower = more black, Higher = more white"
+        )
+    
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("💡 **Quick presets:**")
+    col_preset1, col_preset2 = st.sidebar.columns(2)
+    
+    if col_preset1.button("Clear Table", use_container_width=True):
+        st.session_state.preset = "clear"
+    if col_preset2.button("Low Quality", use_container_width=True):
+        st.session_state.preset = "low_quality"
+    
+    # Apply presets if button clicked
+    if 'preset' in st.session_state:
+        if st.session_state.preset == "clear":
+            contrast_level = 1.5
+            sharpness_level = 2.0
+            brightness_level = 1.0
+            denoise = False
+            binarize = True
+            threshold = 128
+        elif st.session_state.preset == "low_quality":
+            contrast_level = 2.5
+            sharpness_level = 2.5
+            brightness_level = 1.2
+            denoise = True
+            binarize = False
+        del st.session_state.preset
     
     st.sidebar.markdown("---")
     
@@ -139,8 +221,16 @@ if uploaded_file is not None:
     with col2:
         st.subheader("Processed Image")
         
-        # Preprocess the image
-        processed_image = preprocess_image(image, enhance_contrast, sharpen, denoise, binarize)
+        # Preprocess the image with slider values
+        processed_image = preprocess_image(
+            image, 
+            contrast=contrast_level,
+            sharpness=sharpness_level,
+            brightness=brightness_level,
+            denoise=denoise,
+            binarize=binarize,
+            threshold=threshold
+        )
         st.image(processed_image, use_container_width=True)
         
     st.markdown("---")
@@ -220,10 +310,12 @@ if uploaded_file is not None:
 
 st.markdown("---")
 st.markdown("**💡 Tips for best results:**")
-st.markdown("- Use the preprocessing options in the sidebar to enhance image quality")
+st.markdown("- **Adjust sliders in the sidebar** for fine-tuned image enhancement")
+st.markdown("- **Use Quick Presets** for common scenarios (Clear Table or Low Quality)")
+st.markdown("- **Contrast slider**: Increase for faint text, decrease if text is bleeding together")
+st.markdown("- **Sharpness slider**: Increase to make borders clearer")
+st.markdown("- **Brightness slider**: Adjust if image is too dark or too light")
+st.markdown("- **Binarize threshold**: Lower for darker tables, higher for lighter tables")
 st.markdown("- **Enable 'Specify number of columns'** if you know the exact column count - this greatly improves accuracy")
-st.markdown("- Enable 'Binarize' for tables with very clear borders and text")
-st.markdown("- Try different preprocessing combinations if results aren't satisfactory")
-st.markdown("- Ensure the table has clear borders and good contrast")
 st.markdown("- Use high-resolution images for better accuracy")
 st.markdown("- Tables with aligned columns work best")
