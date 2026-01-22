@@ -13,6 +13,7 @@ A free Streamlit application that converts screenshots of tables into downloadab
 - 🔍 Automatic text extraction using Tesseract OCR
 - 📊 Convert extracted data to structured DataFrame
 - 🎛️ Toggle header row recognition
+- 🔢 **Column count hint** - specify expected number of columns for improved parsing
 - 👀 Side-by-side preview of original and processed images
 - 💾 Download as CSV or XLSX format
 - 🎯 Automatic numeric data type detection
@@ -84,17 +85,22 @@ Your app will be live at a free Streamlit Cloud URL!
    - Enable "Binarize" for tables with very clear borders (black & white)
 3. View the original and processed images side-by-side
 4. Check or uncheck "Table has a header row" as needed
-5. Review the extracted table data
-6. Click "Download as CSV" or "Download as XLSX"
-7. Check the "Raw Extracted Text" expander to see what OCR detected
+5. **Optional but recommended:** Enable "Specify number of columns" and enter the exact column count
+   - This significantly improves parsing accuracy for tables with known column counts
+   - The tool will intelligently split or merge data to match your specified columns
+6. Review the extracted table data
+7. Click "Download as CSV" or "Download as XLSX"
+8. Check the "Raw Extracted Text" expander to see what OCR detected
 
 ## Tips for Best Results
 
 - **Start with default preprocessing settings** - they work well for most tables
+- **Use the column count feature** - if you know your table has exactly N columns, enable this option for much better accuracy
 - **For low-contrast images**: Enable all preprocessing options
 - **For very clear tables**: Try enabling "Binarize" for best results
 - **If text is blurry**: Make sure "Sharpen Edges" is enabled
 - **If background is noisy**: Enable "Reduce Noise"
+- **If columns are misaligned**: Use the "Specify number of columns" option
 - Use high-resolution images with clear, readable text
 - Ensure good contrast between table text and background
 - Tables with clear column alignment work best
