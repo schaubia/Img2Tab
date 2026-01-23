@@ -117,8 +117,12 @@ st.markdown("Upload a screenshot of a table, and I'll convert it to CSV or XLSX 
 # Create tabs for different input methods
 tab1, tab2 = st.tabs(["📁 Upload File", "📋 Paste from Clipboard"])
 
+uploaded_file = None
+
 with tab1:
-    uploaded_file = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg', 'jpeg', 'png'])
+    uploaded_file_tab1 = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg', 'jpeg', 'png'])
+    if uploaded_file_tab1 is not None:
+        uploaded_file = uploaded_file_tab1
 
 with tab2:
     st.markdown("**Paste an image from your clipboard:**")
@@ -134,15 +138,8 @@ with tab2:
         errors='raise'
     )
     
-    uploaded_file = None
     if paste_result.image_data is not None:
         uploaded_file = paste_result.image_data
-
-# Add clear button if image is loaded
-if uploaded_file is not None:
-    if st.button("🗑️ Clear Image and Start Over", type="secondary"):
-        st.session_state.clear()
-        st.rerun()
 
 if uploaded_file is not None:
     # Initialize session state for preset defaults
@@ -151,6 +148,13 @@ if uploaded_file is not None:
     
     # Preprocessing options in sidebar
     st.sidebar.subheader("🔧 Image Preprocessing")
+    
+    # Add clear button at the top of sidebar
+    if st.sidebar.button("🗑️ Clear Image and Start Over", type="secondary", use_container_width=True):
+        st.session_state.clear()
+        st.rerun()
+    
+    st.sidebar.markdown("---")
     st.sidebar.markdown("Adjust enhancement levels for better OCR results")
     
     # Set default values based on active preset
