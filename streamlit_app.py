@@ -250,7 +250,18 @@ if uploaded_file is not None:
     
     with col1:
         st.subheader("Original Image")
-        image = Image.open(uploaded_file)
+        
+        # Handle different input types
+        if isinstance(uploaded_file, bytes):
+            # Clipboard paste returns bytes
+            image = Image.open(io.BytesIO(uploaded_file))
+        elif hasattr(uploaded_file, 'read'):
+            # File upload returns file-like object
+            image = Image.open(uploaded_file)
+        else:
+            # Direct PIL Image from paste_result
+            image = uploaded_file
+            
         st.image(image, use_container_width=True)
         
         # Ask if table has header row
