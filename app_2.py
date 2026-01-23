@@ -163,11 +163,11 @@ if uploaded_file is not None:
         default_binarize = False
         default_threshold = 128
     else:
-        # Default values when no preset is active - all neutral
-        default_contrast = 1.0
-        default_sharpness = 1.0
+        # Default values when no preset is active
+        default_contrast = 2.0
+        default_sharpness = 1.5
         default_brightness = 1.0
-        default_denoise = False
+        default_denoise = True
         default_binarize = False
         default_threshold = 128
     
@@ -369,10 +369,9 @@ if uploaded_file is not None:
 
 st.markdown("---")
 st.markdown("**💡 Tips for best results:**")
-st.markdown("- **Defaults are neutral** (sliders at 1.0) - original image without processing")
-st.markdown("- **Use Quick Presets** for automatic enhancement: Clear Table or Low Quality")
+st.markdown("- **Adjust sliders in the sidebar** for fine-tuned image enhancement")
+st.markdown("- **Use Quick Presets**: Clear Table or Low Quality for common scenarios")
 st.markdown("- **Enable 'Specify number of columns'** if you know the exact column count")
-st.markdown("- **Adjust sliders only if needed** - increase above 1.0 for enhancement")
 st.markdown("- **Contrast slider**: Increase for faint text, decrease if text is bleeding together")
 st.markdown("- **Sharpness slider**: Increase to make borders clearer")
 st.markdown("- **Brightness slider**: Adjust if image is too dark or too light")

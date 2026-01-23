@@ -85,12 +85,12 @@ Your app will be live at a free Streamlit Cloud URL!
    - **Paste from Clipboard**: 
      - Take a screenshot (Windows: Win+Shift+S, Mac: Cmd+Shift+4)
      - Click the paste button and press Ctrl+V (or Cmd+V on Mac)
-2. **Adjust preprocessing sliders** in the sidebar for optimal results:
-   - **Contrast Enhancement**: Drag slider to adjust contrast (default: 2.0x)
-   - **Sharpness**: Control edge sharpness (default: 1.5x)
-   - **Brightness**: Adjust overall brightness (default: 1.0x)
-   - **Reduce Noise**: Toggle to remove artifacts
-   - **Binarize**: Enable for black & white conversion
+2. **Adjust preprocessing sliders** in the sidebar as needed:
+   - **Contrast Enhancement**: Drag slider to adjust contrast (default: 1.0 - no change)
+   - **Sharpness**: Control edge sharpness (default: 1.0 - no change)
+   - **Brightness**: Adjust overall brightness (default: 1.0 - no change)
+   - **Reduce Noise**: Toggle to remove artifacts (default: OFF)
+   - **Binarize**: Enable for black & white conversion (default: OFF)
    - **Binarization Threshold**: Fine-tune the black/white cutoff (only when binarize enabled)
    - **Quick Presets**: Click "Clear Table" or "Low Quality" for instant optimal settings
 3. View the original and processed images side-by-side with real-time updates
@@ -105,15 +105,16 @@ Your app will be live at a free Streamlit Cloud URL!
 ## Tips for Best Results
 
 - **Use clipboard paste for quick workflow** - take a screenshot and paste directly!
-- **Start with default slider settings** - they work well for most tables
-- **Use Quick Presets**:
+- **Start with neutral defaults** (all sliders at 1.0) - the original image without processing
+- **Use Quick Presets for enhancement**:
   - "Clear Table" - for high-quality scans with clear borders
   - "Low Quality" - for blurry, low-contrast, or poorly lit images
+- **Adjust sliders only if needed** - many images work well without preprocessing
 - **To reset**: Simply refresh the page or re-upload your image
 - **Fine-tune individual sliders**:
-  - **Contrast too low?** → Text appears faint → Increase contrast slider
-  - **Contrast too high?** → Text bleeds together → Decrease contrast slider
-  - **Blurry borders?** → Increase sharpness slider
+  - **Contrast too low?** → Text appears faint → Increase contrast slider above 1.0
+  - **Contrast too high?** → Text bleeds together → Decrease contrast slider below 1.0
+  - **Blurry borders?** → Increase sharpness slider above 1.0
   - **Image too dark/light?** → Adjust brightness slider
   - **For binarization**: Lower threshold = more black, Higher threshold = more white
 - **Use "Specify number of columns"** if you know your table's exact column count
