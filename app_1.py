@@ -117,18 +117,47 @@ st.markdown("Upload a screenshot of a table, and I'll convert it to CSV or XLSX 
 uploaded_file = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg', 'jpeg', 'png'])
 
 if uploaded_file is not None:
+    # Initialize session state for preset defaults
+    if 'preset_active' not in st.session_state:
+        st.session_state.preset_active = None
+    
     # Preprocessing options in sidebar
     st.sidebar.subheader("🔧 Image Preprocessing")
     st.sidebar.markdown("Adjust enhancement levels for better OCR results")
+    
+    # Set default values based on active preset
+    if st.session_state.preset_active == "clear":
+        default_contrast = 1.5
+        default_sharpness = 2.0
+        default_brightness = 1.0
+        default_denoise = False
+        default_binarize = True
+        default_threshold = 128
+    elif st.session_state.preset_active == "low_quality":
+        default_contrast = 2.5
+        default_sharpness = 2.5
+        default_brightness = 1.2
+        default_denoise = True
+        default_binarize = False
+        default_threshold = 128
+    else:
+        # Default values when no preset is active
+        default_contrast = 2.0
+        default_sharpness = 1.5
+        default_brightness = 1.0
+        default_denoise = True
+        default_binarize = False
+        default_threshold = 128
     
     # Contrast enhancement slider
     contrast_level = st.sidebar.slider(
         "Contrast Enhancement",
         min_value=0.0,
         max_value=3.0,
-        value=2.0,
+        value=default_contrast,
         step=0.1,
-        help="1.0 = original, >1.0 = more contrast, <1.0 = less contrast"
+        help="1.0 = original, >1.0 = more contrast, <1.0 = less contrast",
+        key=f"contrast_{st.session_state.preset_active}"
     )
     
     # Sharpness enhancement slider
@@ -136,9 +165,10 @@ if uploaded_file is not None:
         "Sharpness",
         min_value=0.0,
         max_value=3.0,
-        value=1.5,
+        value=default_sharpness,
         step=0.1,
-        help="1.0 = original, >1.0 = sharper edges, <1.0 = softer"
+        help="1.0 = original, >1.0 = sharper edges, <1.0 = softer",
+        key=f"sharpness_{st.session_state.preset_active}"
     )
     
     # Brightness adjustment slider
@@ -146,64 +176,51 @@ if uploaded_file is not None:
         "Brightness",
         min_value=0.5,
         max_value=2.0,
-        value=1.0,
+        value=default_brightness,
         step=0.1,
-        help="1.0 = original, >1.0 = brighter, <1.0 = darker"
+        help="1.0 = original, >1.0 = brighter, <1.0 = darker",
+        key=f"brightness_{st.session_state.preset_active}"
     )
     
-    # Denoise checkbox (keep this as binary)
-    denoise = st.sidebar.checkbox("Reduce Noise", value=True,
-                                  help="Removes noise and artifacts from the image")
+    # Denoise checkbox
+    denoise = st.sidebar.checkbox(
+        "Reduce Noise",
+        value=default_denoise,
+        help="Removes noise and artifacts from the image",
+        key=f"denoise_{st.session_state.preset_active}"
+    )
     
     # Binarize checkbox with threshold slider
-    binarize = st.sidebar.checkbox("Binarize (Black & White)", value=False,
-                                   help="Convert to pure black and white - best for clear tables")
+    binarize = st.sidebar.checkbox(
+        "Binarize (Black & White)",
+        value=default_binarize,
+        help="Convert to pure black and white - best for clear tables",
+        key=f"binarize_{st.session_state.preset_active}"
+    )
     
-    threshold = 128
+    threshold = default_threshold
     if binarize:
         threshold = st.sidebar.slider(
             "Binarization Threshold",
             min_value=0,
             max_value=255,
-            value=128,
+            value=default_threshold,
             step=5,
-            help="Lower = more black, Higher = more white"
+            help="Lower = more black, Higher = more white",
+            key=f"threshold_{st.session_state.preset_active}"
         )
     
     st.sidebar.markdown("---")
     st.sidebar.markdown("💡 **Quick presets:**")
-    col_preset1, col_preset2, col_preset3 = st.sidebar.columns(3)
+    col_preset1, col_preset2 = st.sidebar.columns(2)
     
     if col_preset1.button("Clear Table", use_container_width=True):
-        st.session_state.preset = "clear"
+        st.session_state.preset_active = "clear"
+        st.rerun()
+        
     if col_preset2.button("Low Quality", use_container_width=True):
-        st.session_state.preset = "low_quality"
-    if col_preset3.button("Reset", use_container_width=True):
-        st.session_state.preset = "reset"
-    
-    # Apply presets if button clicked
-    if 'preset' in st.session_state:
-        if st.session_state.preset == "clear":
-            contrast_level = 1.5
-            sharpness_level = 2.0
-            brightness_level = 1.0
-            denoise = False
-            binarize = True
-            threshold = 128
-        elif st.session_state.preset == "low_quality":
-            contrast_level = 2.5
-            sharpness_level = 2.5
-            brightness_level = 1.2
-            denoise = True
-            binarize = False
-        elif st.session_state.preset == "reset":
-            contrast_level = 2.0
-            sharpness_level = 1.5
-            brightness_level = 1.0
-            denoise = True
-            binarize = False
-            threshold = 128
-        del st.session_state.preset
+        st.session_state.preset_active = "low_quality"
+        st.rerun()
     
     st.sidebar.markdown("---")
     
@@ -320,7 +337,7 @@ if uploaded_file is not None:
 st.markdown("---")
 st.markdown("**💡 Tips for best results:**")
 st.markdown("- **Adjust sliders in the sidebar** for fine-tuned image enhancement")
-st.markdown("- **Use Quick Presets**: Clear Table, Low Quality, or Reset to defaults")
+st.markdown("- **Use Quick Presets**: Clear Table or Low Quality for common scenarios")
 st.markdown("- **Enable 'Specify number of columns'** if you know the exact column count")
 st.markdown("- **Contrast slider**: Increase for faint text, decrease if text is bleeding together")
 st.markdown("- **Sharpness slider**: Increase to make borders clearer")

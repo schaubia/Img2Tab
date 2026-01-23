@@ -5,6 +5,7 @@ A free Streamlit application that converts screenshots of tables into downloadab
 ## Features
 
 - 📸 Upload JPG or PNG images containing tables
+- 📋 **Paste images directly from clipboard** - quick screenshot workflow
 - 🎚️ **Advanced image preprocessing with granular slider controls**:
   - Adjustable contrast enhancement (0.0 - 3.0x)
   - Adjustable sharpness (0.0 - 3.0x)
@@ -79,7 +80,11 @@ Your app will be live at a free Streamlit Cloud URL!
 
 ## Usage
 
-1. Click "Browse files" to upload a screenshot (JPG or PNG)
+1. **Choose input method** - use either tab:
+   - **Upload File**: Click "Browse files" to upload a screenshot (JPG or PNG)
+   - **Paste from Clipboard**: 
+     - Take a screenshot (Windows: Win+Shift+S, Mac: Cmd+Shift+4)
+     - Click the paste button and press Ctrl+V (or Cmd+V on Mac)
 2. **Adjust preprocessing sliders** in the sidebar for optimal results:
    - **Contrast Enhancement**: Drag slider to adjust contrast (default: 2.0x)
    - **Sharpness**: Control edge sharpness (default: 1.5x)
@@ -99,6 +104,7 @@ Your app will be live at a free Streamlit Cloud URL!
 
 ## Tips for Best Results
 
+- **Use clipboard paste for quick workflow** - take a screenshot and paste directly!
 - **Start with default slider settings** - they work well for most tables
 - **Use Quick Presets**:
   - "Clear Table" - for high-quality scans with clear borders

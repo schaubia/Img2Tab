@@ -114,7 +114,29 @@ def parse_table_data(extracted_text, expected_columns=None):
 st.title("📊 Table Screenshot Converter")
 st.markdown("Upload a screenshot of a table, and I'll convert it to CSV or XLSX format")
 
-uploaded_file = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg', 'jpeg', 'png'])
+# Create tabs for different input methods
+tab1, tab2 = st.tabs(["📁 Upload File", "📋 Paste from Clipboard"])
+
+with tab1:
+    uploaded_file = st.file_uploader("Choose an image file (JPG or PNG)", type=['jpg', 'jpeg', 'png'])
+
+with tab2:
+    st.markdown("**Paste an image from your clipboard:**")
+    st.markdown("1. Take a screenshot or copy an image (Ctrl+C / Cmd+C)")
+    st.markdown("2. Click the button below and paste (Ctrl+V / Cmd+V)")
+    
+    from streamlit_paste_button import paste_image_button as pbutton
+    
+    paste_result = pbutton(
+        label="📋 Click here and paste your image",
+        background_color="#FF0000",
+        hover_background_color="#380909",
+        errors='raise'
+    )
+    
+    uploaded_file = None
+    if paste_result.image_data is not None:
+        uploaded_file = paste_result.image_data
 
 if uploaded_file is not None:
     # Initialize session state for preset defaults
