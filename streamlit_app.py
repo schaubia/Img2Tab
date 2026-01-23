@@ -138,6 +138,12 @@ with tab2:
     if paste_result.image_data is not None:
         uploaded_file = paste_result.image_data
 
+# Add clear button if image is loaded
+if uploaded_file is not None:
+    if st.button("🗑️ Clear Image and Start Over", type="secondary"):
+        st.session_state.clear()
+        st.rerun()
+
 if uploaded_file is not None:
     # Initialize session state for preset defaults
     if 'preset_active' not in st.session_state:
