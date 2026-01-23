@@ -87,7 +87,7 @@ Your app will be live at a free Streamlit Cloud URL!
    - **Reduce Noise**: Toggle to remove artifacts
    - **Binarize**: Enable for black & white conversion
    - **Binarization Threshold**: Fine-tune the black/white cutoff (only when binarize enabled)
-   - **Quick Presets**: Click "Clear Table", "Low Quality", or "Reset" for instant settings
+   - **Quick Presets**: Click "Clear Table" or "Low Quality" for instant optimal settings
 3. View the original and processed images side-by-side with real-time updates
 4. Check or uncheck "Table has a header row" as needed
 5. **Optional:** Enable "Specify number of columns" and enter the exact column count if you know it
@@ -103,7 +103,7 @@ Your app will be live at a free Streamlit Cloud URL!
 - **Use Quick Presets**:
   - "Clear Table" - for high-quality scans with clear borders
   - "Low Quality" - for blurry, low-contrast, or poorly lit images
-  - "Reset" - restore all settings to default values
+- **To reset**: Simply refresh the page or re-upload your image
 - **Fine-tune individual sliders**:
   - **Contrast too low?** → Text appears faint → Increase contrast slider
   - **Contrast too high?** → Text bleeds together → Decrease contrast slider
