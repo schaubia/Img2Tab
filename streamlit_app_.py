@@ -58,25 +58,6 @@ def preprocess_image(image, contrast=1.0, sharpness=1.0, brightness=1.0, denoise
     
     return processed
 
-def dedupe_columns(columns):
-    """
-    Ensure column labels are unique (pyarrow/st.dataframe fails on duplicate
-    column names, e.g. when OCR produces two blank or identical header cells).
-    Blank labels become 'Column', then any repeated label gets a numeric suffix.
-    """
-    seen = {}
-    result = []
-    for col in columns:
-        label = str(col).strip() or "Column"
-        if label in seen:
-            seen[label] += 1
-            label = f"{label}_{seen[label]}"
-        else:
-            seen[label] = 0
-        result.append(label)
-    return result
-
-
 def parse_table_data(extracted_text, expected_columns=None):
     """
     Parse extracted text into table data with optional column hint
@@ -348,11 +329,6 @@ if uploaded_file is not None:
                 # No header - use default column names
                 df = pd.DataFrame(table_data)
                 df.columns = [f'Column_{i+1}' for i in range(len(df.columns))]
-
-            # Guard against duplicate/blank column labels (OCR can produce
-            # repeated or empty header cells), which breaks st.dataframe's
-            # pyarrow conversion with a "Duplicate column names found" error.
-            df.columns = dedupe_columns(df.columns)
             
             # Try to convert numeric columns
             for col in df.columns:
