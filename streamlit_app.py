@@ -165,6 +165,16 @@ if uploaded_file is not None:
     if 'preset_active' not in st.session_state:
         st.session_state.preset_active = None
     
+    # OCR language selection
+    st.sidebar.subheader("🌐 OCR Language")
+    ocr_language = st.sidebar.selectbox(
+        "Text language in the table",
+        options=["bul+eng", "bul", "eng"],
+        index=0,
+        help="'bul+eng' recognizes both Cyrillic and Latin text - use this for mixed tables. Pick a single language if you know the table contains only one.",
+        format_func=lambda x: {"bul+eng": "Bulgarian + English", "bul": "Bulgarian only", "eng": "English only"}[x]
+    )
+    
     # Preprocessing options in sidebar
     st.sidebar.subheader("🔧 Image Preprocessing")
     
@@ -327,7 +337,7 @@ if uploaded_file is not None:
     with st.spinner("Processing image..."):
         # Extract text using Tesseract OCR on processed image
         custom_config = r'--oem 3 --psm 6'
-        extracted_text = pytesseract.image_to_string(processed_image, config=custom_config)
+        extracted_text = pytesseract.image_to_string(processed_image, lang=ocr_language, config=custom_config)
         
         # Parse the extracted text into a table with optional column hint
         table_data = parse_table_data(extracted_text, expected_columns)
